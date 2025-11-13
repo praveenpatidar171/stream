@@ -75,8 +75,6 @@ export async function GET(request: Request) {
 	if (andConditions.length > 0) {
 		where.AND = andConditions;
 	}
-	console.log('where object', where);
-	console.log('isLiveParam', isLiveParam);
 	const streams = await prisma.stream.findMany({
 		where,
 		orderBy: { updatedAt: "desc" },

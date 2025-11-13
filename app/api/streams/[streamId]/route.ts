@@ -15,7 +15,7 @@ const updateStreamSchema = z
 		visibility: z.enum(visibilityValues).optional(),
 		slug: z.string().min(3).max(160).optional(),
 		isLive: z.boolean().optional(),
-		hlsUrl: z.string().url("Must be a valid URL").nullable().optional(),
+		hlsUrl: z.url("Must be a valid URL").nullable().optional(),
 	})
 	.refine(
 		(data) =>
@@ -92,7 +92,7 @@ export async function PATCH(
 
 	if (!parsed.success) {
 		return NextResponse.json(
-			{ error: "Invalid input", details: parsed.error.flatten() },
+			{ error: "Invalid input", details: parsed.error.message },
 			{ status: 400 },
 		);
 	}
