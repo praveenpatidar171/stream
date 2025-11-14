@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import { useRouter } from "next/navigation";
 
 interface Stream {
 	id: string;
@@ -17,6 +18,7 @@ interface Stream {
 }
 
 export default function DashboardClient() {
+	const router = useRouter();
 	const [streams, setStreams] = useState<Stream[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -43,7 +45,8 @@ export default function DashboardClient() {
 
 		try {
 			await axios.delete(`/api/streams/${streamId}`);
-			fetchStreams();
+			await fetchStreams();
+			router.refresh();
 		} catch (err: any) {
 			alert(err.response?.data?.error || "Failed to delete stream");
 		}
@@ -54,7 +57,8 @@ export default function DashboardClient() {
 			await axios.patch(`/api/streams/${streamId}`, {
 				isLive: !currentStatus,
 			});
-			fetchStreams();
+			await fetchStreams();
+			router.refresh();
 		} catch (err: any) {
 			alert(err.response?.data?.error || "Failed to update stream");
 		}
@@ -178,9 +182,10 @@ export default function DashboardClient() {
 				{showCreateModal && (
 					<CreateStreamModal
 						onClose={() => setShowCreateModal(false)}
-						onSuccess={() => {
+						onSuccess={async () => {
 							setShowCreateModal(false);
-							fetchStreams();
+							await fetchStreams();
+							router.refresh();
 						}}
 					/>
 				)}
@@ -192,7 +197,7 @@ export default function DashboardClient() {
 
 interface CreateStreamModalProps {
 	onClose: () => void;
-	onSuccess: () => void;
+	onSuccess: () => void | Promise<void>;
 }
 
 function CreateStreamModal({ onClose, onSuccess }: CreateStreamModalProps) {
@@ -213,7 +218,7 @@ function CreateStreamModal({ onClose, onSuccess }: CreateStreamModalProps) {
 				description: description || undefined,
 				visibility,
 			});
-			onSuccess();
+			await onSuccess();
 		} catch (err: any) {
 			setError(err.response?.data?.error || "Failed to create stream");
 		} finally {

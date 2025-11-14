@@ -15,6 +15,13 @@ export default function Navbar() {
 					</Link>
 
 					<div className="flex items-center gap-4">
+						<Link
+							href="/streams"
+							className="text-gray-700 dark:text-gray-300 hover:text-blue-600 transition-colors"
+						>
+							Streams
+						</Link>
+
 						{session ? (
 							<>
 								<Link
